@@ -2,7 +2,7 @@ import java.util.*;
 
 public class Main {
     public static void main(String[] args) {
-        String[] words = {"java", "python", "java", "golang", "java", "python"};
+        String[] words = {"java", "python", "java", "golang", "java", "python", "c", "c", "c"};
         int k = 2;
         SigmaTechTest top = new SigmaTechTest();
         List<String> result = top.topKFrequent(words, k);
@@ -18,8 +18,8 @@ public class Main {
         validJson1.put("user", validJson1Child);
         System.out.println(top.isValidJson(validJson1));
 
-        Map<String, Object> validJson2 = new HashMap<>();
-        validJson2.put("123", "wrong");
+        Map<Integer, Object> validJson2 = new HashMap<>();
+        validJson2.put(123, "wrong");
         System.out.println(top.isValidJson(validJson2));
     }
 }
@@ -32,31 +32,27 @@ class SigmaTechTest {
     }
 
     public List<String> topKFrequent(String[] words, int k){
-        for(int i = 0; i < words.length; i++){
-
-        }
-
         HashSet<String> distinctNum = new HashSet<>();
-        HashMap<String, Integer> infoNum = new HashMap<>();
+        TreeMap<String, Integer> infoNum = new TreeMap<>();
 
         //distinct num
-        for(int i = 0; i < words.length; i++){
+        for (int i = 0; i < words.length; i++) {
             distinctNum.add(words[i]);
         }
 
-        //find info each num
-        for(String distNum: distinctNum){
+        //find info count each word
+        for (String distNum : distinctNum) {
             int found = 0;
-            for(int j = 0; j < words.length; j++){
-                if(distNum == words[j]){
+            for (int j = 0; j < words.length; j++) {
+                if (distNum == words[j]) {
                     found = found + 1;
                 }
             }
             infoNum.put(distNum, found);
         }
 
-        //sort value
-        int[] sortByValue = new int[infoNum.size()];
+        //get sorted value on map
+        Integer[] sortByValue = new Integer[infoNum.size()];
         int index = 0;
         for (Map.Entry<String, Integer> entry : infoNum.entrySet()) {
             String key = entry.getKey();
@@ -64,61 +60,46 @@ class SigmaTechTest {
             sortByValue[index] = value;
             index = index + 1;
         }
-        Arrays.sort(sortByValue);
-        for(int i = 0; i < sortByValue.length; i++){
+        Arrays.sort(sortByValue, Collections.reverseOrder());
 
-        }
-
-        //sorting ways 1
+        //create nested list ascending by frequency
         List<List<String>> list = new ArrayList<>();
-        int max = sortByValue[sortByValue.length-1];
-        int min = sortByValue[0];
-        for(int i = min; i <= max; i++){
+        int max = sortByValue[0];
+        int min = sortByValue[sortByValue.length - 1];
+        String oldKey = "";
+        for (int i = max; i >= min; i--) {
             List<String> intVal = new ArrayList<>();
             for (Map.Entry<String, Integer> entry : infoNum.entrySet()) {
                 String key = entry.getKey();
                 Integer value = entry.getValue();
-                if(value == i) {
+                if (value == i) {
+                    if(!oldKey.equals(key)){
+                        intVal = new ArrayList<>();
+                    }
                     for (int j = 0; j < value; j++) {
                         intVal.add(key);
                     }
+                    if(!oldKey.equals(key)){
+                        list.add(intVal);
+                    }
+                    oldKey = key;
                 }
             }
-            Collections.sort(intVal);
-            Collections.reverse(intVal);
-            list.add(intVal);
         }
 
-        index = 0;
-        for(List<String> entry: list){
-            for(int i = 0; i < entry.size(); i++){
-                words[index] = entry.get(i);
-                index = index + 1;
-            }
-        }
-
-        List<String> result = new ArrayList<>();
-        for(int i = 0; i < words.length; i++){
-            result.add(words[i]);
-        }
-
-        Collections.reverse(result);
-        //distinct array
-        distinctNum = new HashSet<>();
-        //distinct num
-        for(int i = 0; i < result.size(); i++){
-            distinctNum.add(result.get(i));
-        }
+        // create list base on k
         List<String> finalResult = new ArrayList<>();
-        int i = 0;
-        for(String distNum: distinctNum){
-            if(i == k) {
-                break;
+        int j = 0;
+        for (List<String> entry : list) {
+            if (j < k) {
+                for (int i = 0; i < entry.size(); i++) {
+                    finalResult.add(entry.get(i));
+                    break;
+                }
+                j++;
             }
-            finalResult.add(distNum);
-            i++;
         }
-        Collections.reverse(finalResult);
+
         return finalResult;
     }
 
@@ -131,7 +112,7 @@ class SigmaTechTest {
         }
         if(input instanceof List<?>){
             for(Object elem: (List<?>) input){
-                if(isValidJson(elem)){
+                if(!isValidJson(elem)){
                     return false;
                 }
             }
@@ -180,7 +161,7 @@ class SigmaTechTest {
             }
             infoNum.put(distNum, found);
         }
-        System.out.println("infoNum : " + infoNum);
+        System.out.println(infoNum);
     }
 
 }
